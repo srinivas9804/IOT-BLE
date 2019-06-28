@@ -17,19 +17,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 import java.util.UUID;
 
 
 /**
- * @author Srinivas Sivakumar <srinivas9804@gmail.com>
+ * @author Srinivas Sivakumar <srinivas9804@gmail.com,github.com/srinivas9804>
  *
  *     Application to connect to a Bluetooth Low Energy(BLE) module.
  *     Connects to a microchip RN4870 chip and uses the transparent UART mode to
@@ -44,16 +40,14 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothDevice mDevice;
     private BluetoothGatt mBluetoothGatt;
-    private BluetoothGattCharacteristic writeCharac, readCharac;
+    private BluetoothGattCharacteristic writeCharacteristic, readCharacteristic;
     private BluetoothGattDescriptor readDescriptor;
 
     final UUID READ_WRITE_SERVICE_UUID = UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455");
     final UUID WRITE_CHARACTERISTIC_UUID = UUID.fromString("49535343-1E4D-4BD9-BA61-23C647249616");
     final UUID READ_CHARACTERISTIC_UUID = UUID.fromString("49535343-1E4D-4BD9-BA61-23C647249616");
     final UUID READ_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
-    Button mConnect, mSend;
-    EditText mSendText;
-    static TextView mReceiveText;
+    Button mConnect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,22 +55,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mConnect = (Button) findViewById(R.id.connectButton);
-        mSend = (Button) findViewById(R.id.sendButton);
-        mSendText = (EditText) findViewById(R.id.sendText);
-        MainActivity.mReceiveText = (TextView) findViewById(R.id.receiveTextView);
-
         mConnect.setOnClickListener((View view)->{
             mBluetoothGatt = mDevice
                     .connectGatt(MainActivity.this, false, mGattCallback);
-        });
-
-        mSend.setOnClickListener((View view)->{
-            String text = mSendText.getText().toString();
-            byte[] value = text.getBytes();
-            writeCharac.setValue(value);
-            boolean flag = mBluetoothGatt.writeCharacteristic(writeCharac);
-            Log.i("BGatt", "status " + flag);
-            Toast.makeText(this, "Write status: " + flag, Toast.LENGTH_SHORT).show();
         });
 
         if (ContextCompat.checkSelfPermission(this,
@@ -176,30 +157,32 @@ public class MainActivity extends AppCompatActivity {
                     Log.e("BGatt", "service not found!");
                 }
                 else {
-                    writeCharac = Service.getCharacteristic(WRITE_CHARACTERISTIC_UUID);
-                    if (writeCharac == null) {
+                    writeCharacteristic = Service.getCharacteristic(WRITE_CHARACTERISTIC_UUID);
+                    if (writeCharacteristic == null) {
                         Log.e("BGatt", "char not found!");
                     }
                 }
-                readCharac = Service.getCharacteristic(READ_CHARACTERISTIC_UUID);
-                if (readCharac == null) {
+                readCharacteristic = Service.getCharacteristic(READ_CHARACTERISTIC_UUID);
+                if (readCharacteristic == null) {
                     Log.e("BGatt", "char not found!");
                 }
-                mBluetoothGatt.setCharacteristicNotification(readCharac, true);
-                readDescriptor = readCharac.getDescriptor(READ_DESCRIPTOR_UUID);
+                mBluetoothGatt.setCharacteristicNotification(readCharacteristic, true);
+                readDescriptor = readCharacteristic.getDescriptor(READ_DESCRIPTOR_UUID);
                 readDescriptor.setValue(
                         BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
 
                 boolean flag = mBluetoothGatt.writeDescriptor(readDescriptor);
                 Log.i("BGatt", "status " + flag);
 
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(MainActivity.this,
-                                "Transparent UART link successful", Toast.LENGTH_SHORT).show();
-                    }
-                });
+//                new Handler(Looper.getMainLooper()).post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Toast.makeText(MainActivity.this,
+//                                "Transparent UART link successful", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+                Intent intent = new Intent(MainActivity.this, DisplayActivity.class);
+                startActivity(intent);
 
             } else {
                 Log.i(TAG, "onServicesDiscovered received: " + status);
@@ -221,7 +204,10 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             Log.i(TAG, "Received text = " +  new String(characteristic.getValue()));
-            MainActivity.mReceiveText.setText(new String(characteristic.getValue()));
+            //MainActivity.mReceiveText.setText(new String(characteristic.getValue()));
+            if(characteristic.equals(readCharacteristic)) {
+                DisplayActivity.update(new String(characteristic.getValue()));
+            }
         }
     };
 }
