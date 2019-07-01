@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 mConnectionState = STATE_DISCONNECTED;
                 Log.i(TAG, "Disconnected from GATT server.");
+                DisplayActivity.endActivity();
             }
         }
 
