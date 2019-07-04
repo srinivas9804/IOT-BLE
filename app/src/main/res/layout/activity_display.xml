@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorWhite"
     tools:context=".DisplayActivity">
 
     <TextView
@@ -11,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:text="Sensor Data"
         android:textSize="24sp"
@@ -19,7 +20,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2"
+        app:layout_constraintTop_toBottomOf="@+id/uclBanner"
         app:textAllCaps="false" />
 
     <TextView
@@ -27,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="16dp"
         android:text="Humidity :"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerTextView" />
@@ -101,6 +102,36 @@
         app:layout_constraintTop_toBottomOf="@+id/vocLabel" />
 
     <TextView
+        android:id="@+id/pm1Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:text="PM 1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/eco2Label" />
+
+    <TextView
+        android:id="@+id/pm25Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:text="PM 2.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pm1Label" />
+
+    <TextView
+        android:id="@+id/pm10Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:text="PM 10"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pm25Label" />
+
+    <TextView
         android:id="@+id/airPressureValueLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -136,14 +167,125 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/eco2Label" />
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="fill_parent"
+    <TextView
+        android:id="@+id/pm1ValueLabel"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY"
+        android:layout_marginEnd="192dp"
+        android:text="NaN"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/pm1Label" />
+
+    <TextView
+        android:id="@+id/pm25ValueLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="192dp"
+        android:text="NaN"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/pm25Label" />
+
+    <TextView
+        android:id="@+id/pm10ValueLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="192dp"
+        android:text="NaN"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/pm10Label" />
+
+    <TextView
+        android:id="@+id/humidityUnitLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="%"
+        app:layout_constraintLeft_toRightOf="@+id/humidityValueLabel"
+        app:layout_constraintTop_toTopOf="@+id/humidityLabel" />
+
+    <TextView
+        android:id="@+id/temperatureUnitLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="C"
+        app:layout_constraintLeft_toRightOf="@+id/temperatureValueLabel"
+        app:layout_constraintTop_toTopOf="@+id/temperatureLabel" />
+
+    <TextView
+        android:id="@+id/airPressureUnitLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="kPa"
+        app:layout_constraintLeft_toRightOf="@+id/airPressureValueLabel"
+        app:layout_constraintTop_toTopOf="@+id/airPressureLabel" />
+
+    <TextView
+        android:id="@+id/altitudeUnitLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="m"
+        app:layout_constraintLeft_toRightOf="@+id/altitudeValueLabel"
+        app:layout_constraintTop_toTopOf="@+id/altitudeLabel" />
+
+    <TextView
+        android:id="@+id/vocUnitLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ppb"
+        app:layout_constraintLeft_toRightOf="@+id/vocValueLabel"
+        app:layout_constraintTop_toTopOf="@+id/vocLabel" />
+
+    <TextView
+        android:id="@+id/eco2UnitLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ppm"
+        app:layout_constraintLeft_toRightOf="@+id/eco2ValueLabel"
+        app:layout_constraintTop_toTopOf="@+id/eco2Label" />
+
+    <TextView
+        android:id="@+id/pm01UnitLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ug/m3"
+        app:layout_constraintLeft_toRightOf="@+id/pm1ValueLabel"
+        app:layout_constraintTop_toTopOf="@+id/pm1Label" />
+
+    <TextView
+        android:id="@+id/pm25UnitLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ug/m3"
+        app:layout_constraintLeft_toRightOf="@+id/pm25ValueLabel"
+        app:layout_constraintTop_toTopOf="@+id/pm25Label" />
+
+    <TextView
+        android:id="@+id/pm10UnitLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ug/m3"
+        app:layout_constraintLeft_toRightOf="@+id/pm10ValueLabel"
+        app:layout_constraintTop_toTopOf="@+id/pm10Label" />
+
+    <ImageView
+        android:id="@+id/uclBanner"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ucl_banner" />
+
+    <ImageView
+        android:id="@+id/airTrackerLogo"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/uclBanner"
+        app:srcCompat="@drawable/air_quality_banner" />
 </androidx.constraintlayout.widget.ConstraintLayout>

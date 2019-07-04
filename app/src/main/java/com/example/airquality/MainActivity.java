@@ -17,15 +17,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 import java.util.UUID;
 
 
 /**
- * @author Srinivas Sivakumar <srinivas9804@gmail.com,github.com/srinivas9804>
+ * @author Srinivas Sivakumar <srinivas9804@gmail.com,www.github.com/srinivas9804>
  *
  *     Application to connect to a Bluetooth Low Energy(BLE) module.
  *     Connects to a microchip RN4870 chip and uses the transparent UART mode to
@@ -49,10 +51,24 @@ public class MainActivity extends AppCompatActivity {
     final UUID READ_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
     Button mConnect;
 
+    ImageView uclBanner, airQualityLogo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;
+        uclBanner = (ImageView) findViewById(R.id.uclBanner);
+        airQualityLogo = (ImageView) findViewById(R.id.airTrackerLogo);
+
+        uclBanner.getLayoutParams().width = (int)(0.6*width) ;
+        airQualityLogo.getLayoutParams().width = (int)(0.3*width);
+        Log.i("imageSize", "width: " + width + " " + uclBanner.getLayoutParams().width + " " +airQualityLogo.getLayoutParams().width);
+        Log.i("imageSize", "height: " + uclBanner.getLayoutParams().height + " " +airQualityLogo.getLayoutParams().height);
 
         mConnect = (Button) findViewById(R.id.connectButton);
         mConnect.setOnClickListener((View view)->{
@@ -84,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent,0);
         }
-        mDevice = mBluetoothAdapter.getRemoteDevice("D8:80:39:F6:15:2F");
+        mDevice = mBluetoothAdapter.getRemoteDevice("34:81:F4:54:8C:5C");
         if(mDevice == null){
             Log.w("BLEDevice","Not found");
             finish();
