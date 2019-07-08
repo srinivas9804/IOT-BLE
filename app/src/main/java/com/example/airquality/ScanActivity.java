@@ -1,8 +1,9 @@
 package com.example.airquality;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -13,108 +14,147 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-
-/**
- * @author Srinivas Sivakumar <srinivas9804@gmail.com,www.github.com/srinivas9804>
- *
- *     Application to connect to a Bluetooth Low Energy(BLE) module.
- *     Connects to a microchip RN4870 chip and uses the transparent UART mode to
- *     read data asynchronously.
- *
- *     Note: The UUIDs are hard coded based on the datasheet, so make sure that they are
- *     appropriate for other chips.
- *
- */
-
-public class MainActivity extends AppCompatActivity {
+public class ScanActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothDevice mDevice;
     private BluetoothGatt mBluetoothGatt;
     private BluetoothGattCharacteristic writeCharacteristic, readCharacteristic;
     private BluetoothGattDescriptor readDescriptor;
+    private Handler mHandler;
+    private BluetoothLeScanner mLEScanner;
+    private ScanSettings settings;
+    private List<ScanFilter> filters;
+    private List<BluetoothDevice> devices;
+    private static final long SCAN_PERIOD = 2000;
 
     final UUID READ_WRITE_SERVICE_UUID = UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455");
     final UUID WRITE_CHARACTERISTIC_UUID = UUID.fromString("49535343-1E4D-4BD9-BA61-23C647249616");
     final UUID READ_CHARACTERISTIC_UUID = UUID.fromString("49535343-1E4D-4BD9-BA61-23C647249616");
     final UUID READ_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
-    Button mConnect;
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager layoutManager;
 
-    ImageView uclBanner, airQualityLogo;
+    private ImageView uclBanner, airQualityLogo;
+    private Button mRefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_scan);
+        uclBanner = (ImageView) findViewById(R.id.uclBanner);
+        airQualityLogo = (ImageView) findViewById(R.id.airTrackerLogo);
+        mHandler = new Handler();
+        devices = new ArrayList<>();
+        mRefresh = (Button) findViewById(R.id.refreshButton);
+        final BluetoothManager bluetoothManager =
+                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 
+        // Dynamically setting height and width of images
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
-        uclBanner = (ImageView) findViewById(R.id.uclBanner);
-        airQualityLogo = (ImageView) findViewById(R.id.airTrackerLogo);
-
         uclBanner.getLayoutParams().width = (int)(0.6*width) ;
         airQualityLogo.getLayoutParams().width = (int)(0.3*width);
-        Log.i("imageSize", "width: " + width + " " + uclBanner.getLayoutParams().width + " " +airQualityLogo.getLayoutParams().width);
-        Log.i("imageSize", "height: " + uclBanner.getLayoutParams().height + " " +airQualityLogo.getLayoutParams().height);
 
         if (Build.VERSION.SDK_INT >= 23) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
         }
 
-        mConnect = (Button) findViewById(R.id.connectButton);
-        mConnect.setOnClickListener((View view)->{
-            //mBluetoothGatt = mDevice.connectGatt(MainActivity.this, false, mGattCallback);
-            Intent intent = new Intent(MainActivity.this,ScanActivity.class);
-            startActivity(intent);
-        });
 
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Permission is not granted
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_CONTACTS},
-                    0);
-        }
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, "BLE not available", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-        final BluetoothManager bluetoothManager =
-                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
 
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, "BluetoothLE not supported",
-                    Toast.LENGTH_SHORT).show();
-            finish();
-        }
-        if(mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()){
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent,0);
-        }
-        mDevice = mBluetoothAdapter.getRemoteDevice("34:81:F4:54:8C:5C");
-        if(mDevice == null){
-            Log.w("BLEDevice","Not found");
-            finish();
-        }
-        else{
-            Log.w("BLEDevice","found");
+        mLEScanner = mBluetoothAdapter.getBluetoothLeScanner();
+        settings = new ScanSettings.Builder()
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                .build();
+        filters = new ArrayList<ScanFilter>();
+        scanLeDevice(true);
+
+
+        recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        recyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        mAdapter = new MyAdapter(devices);
+        recyclerView.setAdapter(mAdapter);
+
+        mRefresh.setOnClickListener((View view) -> {
+            devices.clear();
+            scanLeDevice(true);
+        });
+    }
+
+    private void scanLeDevice(final boolean enable) {
+        if (enable) {
+            mHandler.postDelayed(()->{
+                mLEScanner.stopScan(mScanCallback);
+            }, SCAN_PERIOD);
+            mLEScanner.startScan(filters, settings, mScanCallback);
+        } else {
+            mLEScanner.stopScan(mScanCallback);
         }
     }
+
+    private ScanCallback mScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            Log.i("shaataAct callbackType", String.valueOf(callbackType));
+            Log.i("shaataAct result", result.toString());
+            BluetoothDevice btDevice = result.getDevice();
+            Log.i("shaataAct device", btDevice.getName() + " " + btDevice.getAddress());
+            boolean flag = true;
+            for(BluetoothDevice bt : devices){
+                if(bt.getAddress().equals(btDevice.getAddress())){
+                    flag = false;
+                    break;
+                }
+            }
+            if(flag){
+                devices.add(btDevice);
+                mAdapter.notifyDataSetChanged();
+                Log.i("shaataAct devices", devices.toString());
+            }
+        }
+
+        @Override
+        public void onBatchScanResults(List<ScanResult> results) {
+            for (ScanResult sr : results) {
+                Log.i("shaataAct - Results", sr.toString());
+            }
+        }
+
+        @Override
+        public void onScanFailed(int errorCode) {
+            Log.e("shaataAct Scan Failed", "Error Code: " + errorCode);
+        }
+    };
 
 
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
@@ -204,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
 //                                "Transparent UART link successful", Toast.LENGTH_SHORT).show();
 //                    }
 //                });
-                Intent intent = new Intent(MainActivity.this, DisplayActivity.class);
+                Intent intent = new Intent(ScanActivity.this, DisplayActivity.class);
                 startActivity(intent);
 
             } else {

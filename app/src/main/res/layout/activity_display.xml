@@ -288,4 +288,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/uclBanner"
         app:srcCompat="@drawable/air_quality_banner" />
+
+    <View
+        android:id="@+id/divider1"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="2dp"
+        android:background="#aaaaaa"
+        app:layout_constraintTop_toBottomOf="@+id/airTrackerLogo"
+        tools:layout_editor_absoluteX="-16dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

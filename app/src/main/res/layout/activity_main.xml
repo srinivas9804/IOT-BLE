@@ -15,8 +15,11 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:backgroundTint="@color/colorTeal"
         android:padding="20dp"
-        android:text="Connect"
+        android:text="Scan "
+        android:textAllCaps="false"
+        android:textColor="@color/colorWhite"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -45,5 +48,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/uclBanner"
         app:srcCompat="@drawable/air_quality_banner" />
+
+    <View
+        android:id="@+id/divider1"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="2dp"
+        android:background="#aaaaaa"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/airTrackerLogo"
+        tools:layout_editor_absoluteX="-16dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
