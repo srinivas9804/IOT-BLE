@@ -9,262 +9,19 @@
 
     <TextView
         android:id="@+id/headerTextView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:text="Sensor Data"
+        android:textColor="#000000"
         android:textSize="24sp"
-        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/uclBanner"
         app:textAllCaps="false" />
-
-    <TextView
-        android:id="@+id/humidityLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:text="Humidity :"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/headerTextView" />
-
-    <TextView
-        android:id="@+id/humidityValueLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="192dp"
-        android:text="NaN"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/humidityLabel" />
-
-    <TextView
-        android:id="@+id/temperatureLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:text="Temperature:"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/humidityLabel" />
-
-    <TextView
-        android:id="@+id/temperatureValueLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="192dp"
-        android:text="NaN"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/temperatureLabel" />
-
-    <TextView
-        android:id="@+id/airPressureLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:text="Air Pressure:"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/temperatureLabel" />
-
-    <TextView
-        android:id="@+id/altitudeLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:text="Altitude"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/airPressureLabel" />
-
-    <TextView
-        android:id="@+id/vocLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:text="VOCs"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/altitudeLabel" />
-
-    <TextView
-        android:id="@+id/eco2Label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:text="eCO2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vocLabel" />
-
-    <TextView
-        android:id="@+id/pm1Label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:text="PM 1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eco2Label" />
-
-    <TextView
-        android:id="@+id/pm25Label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:text="PM 2.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pm1Label" />
-
-    <TextView
-        android:id="@+id/pm10Label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:text="PM 10"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pm25Label" />
-
-    <TextView
-        android:id="@+id/airPressureValueLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="192dp"
-        android:text="NaN"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/airPressureLabel" />
-
-    <TextView
-        android:id="@+id/altitudeValueLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="192dp"
-        android:text="NaN"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/altitudeLabel" />
-
-    <TextView
-        android:id="@+id/vocValueLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="192dp"
-        android:text="NaN"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/vocLabel" />
-
-    <TextView
-        android:id="@+id/eco2ValueLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="192dp"
-        android:text="NaN"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/eco2Label" />
-
-    <TextView
-        android:id="@+id/pm1ValueLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="192dp"
-        android:text="NaN"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/pm1Label" />
-
-    <TextView
-        android:id="@+id/pm25ValueLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="192dp"
-        android:text="NaN"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/pm25Label" />
-
-    <TextView
-        android:id="@+id/pm10ValueLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="192dp"
-        android:text="NaN"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/pm10Label" />
-
-    <TextView
-        android:id="@+id/humidityUnitLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="%"
-        app:layout_constraintLeft_toRightOf="@+id/humidityValueLabel"
-        app:layout_constraintTop_toTopOf="@+id/humidityLabel" />
-
-    <TextView
-        android:id="@+id/temperatureUnitLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="C"
-        app:layout_constraintLeft_toRightOf="@+id/temperatureValueLabel"
-        app:layout_constraintTop_toTopOf="@+id/temperatureLabel" />
-
-    <TextView
-        android:id="@+id/airPressureUnitLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="kPa"
-        app:layout_constraintLeft_toRightOf="@+id/airPressureValueLabel"
-        app:layout_constraintTop_toTopOf="@+id/airPressureLabel" />
-
-    <TextView
-        android:id="@+id/altitudeUnitLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="m"
-        app:layout_constraintLeft_toRightOf="@+id/altitudeValueLabel"
-        app:layout_constraintTop_toTopOf="@+id/altitudeLabel" />
-
-    <TextView
-        android:id="@+id/vocUnitLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ppb"
-        app:layout_constraintLeft_toRightOf="@+id/vocValueLabel"
-        app:layout_constraintTop_toTopOf="@+id/vocLabel" />
-
-    <TextView
-        android:id="@+id/eco2UnitLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ppm"
-        app:layout_constraintLeft_toRightOf="@+id/eco2ValueLabel"
-        app:layout_constraintTop_toTopOf="@+id/eco2Label" />
-
-    <TextView
-        android:id="@+id/pm01UnitLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ug/m3"
-        app:layout_constraintLeft_toRightOf="@+id/pm1ValueLabel"
-        app:layout_constraintTop_toTopOf="@+id/pm1Label" />
-
-    <TextView
-        android:id="@+id/pm25UnitLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ug/m3"
-        app:layout_constraintLeft_toRightOf="@+id/pm25ValueLabel"
-        app:layout_constraintTop_toTopOf="@+id/pm25Label" />
-
-    <TextView
-        android:id="@+id/pm10UnitLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ug/m3"
-        app:layout_constraintLeft_toRightOf="@+id/pm10ValueLabel"
-        app:layout_constraintTop_toTopOf="@+id/pm10Label" />
 
     <ImageView
         android:id="@+id/uclBanner"
@@ -297,5 +54,69 @@
         android:background="#aaaaaa"
         app:layout_constraintTop_toBottomOf="@+id/airTrackerLogo"
         tools:layout_editor_absoluteX="-16dp" />
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="8dp"
+        android:background="#aaaaaa"
+        app:layout_constraintTop_toBottomOf="@+id/headerTextView"
+        tools:layout_editor_absoluteX="-16dp" />
+
+    <HorizontalScrollView
+        android:id="@+id/horizontalScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="128dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divider2">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/dataRecyclerView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+    </HorizontalScrollView>
+
+    <TextView
+        android:id="@+id/macAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/headerTextView" />
+
+    <Button
+        android:id="@+id/deleteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:text="Delete local data"
+        android:textAllCaps="false"
+        android:textColor="@color/colorWhite"
+        app:layout_constraintStart_toEndOf="@+id/uploadButton"
+        app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
+
+    <Button
+        android:id="@+id/uploadButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:text="Upload"
+        android:textAllCaps="false"
+        android:textColor="@color/colorWhite"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

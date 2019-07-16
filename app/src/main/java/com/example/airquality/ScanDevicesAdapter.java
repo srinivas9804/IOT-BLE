@@ -1,19 +1,29 @@
+/**
+ * @author Srinivas Sivakumar <srinivas9804@gmail.com,www.github.com/srinivas9804>
+ *
+ *     Recycler View adapter to display scanned devices in the Scan Activity.
+ *     Connects to a device on clicking a list item.
+ *
+ */
 package com.example.airquality;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+public class ScanDevicesAdapter extends RecyclerView.Adapter<ScanDevicesAdapter.MyViewHolder> {
 
-    List<BluetoothDevice> devices;
+    static List<BluetoothDevice> devices;
+    static Context context;
     //String array[][];//just for testing
 
 
@@ -39,25 +49,30 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         public void onClick(View view) {
             int pos = getLayoutPosition();
             System.out.println(pos);
+            Toast.makeText(context,
+                    "Connecting to the device: " + devices.get(pos).getAddress(), Toast.LENGTH_SHORT).show();
+            ScanActivity.setDevice(devices.get(pos));
+            ScanActivity.connectDevice(pos,context);
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyAdapter(List<BluetoothDevice> devices) {
+    public ScanDevicesAdapter(List<BluetoothDevice> devices, Context context) {
         this.devices = devices;
+        ScanDevicesAdapter.context = context;
     }
 
-//    public MyAdapter(String data[][]) { // test
+//    public ScanDevicesAdapter(String data[][]) { // test
 //        this.array = data;
 //    }
 
     // Create new views (invoked by the layout manager)
     @Override
-    public MyAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent,
-                                                     int viewType) {
+    public ScanDevicesAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent,
+                                                              int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.bluetooth_view, parent, false);
+                .inflate(R.layout.ble_device_view, parent, false);
         MyViewHolder vh = new MyViewHolder(v);
         return vh;
     }

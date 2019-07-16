@@ -31,7 +31,7 @@
         android:textColor="#000000"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/airTrackerLogo" />
+        app:layout_constraintTop_toBottomOf="@+id/uclBanner" />
     <ImageView
         android:id="@+id/uclBanner"
         android:layout_width="300dp"
@@ -59,7 +59,7 @@
         android:id="@+id/divider1"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="4dp"
         android:background="#aaaaaa"
         app:layout_constraintTop_toBottomOf="@+id/airTrackerLogo"
         tools:layout_editor_absoluteX="-16dp" />
@@ -88,11 +88,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:backgroundTint="@color/colorTeal"
+        android:backgroundTint="@color/colorWhite"
         android:padding="20dp"
         android:text="Refresh"
         android:textAllCaps="false"
-        android:textColor="@color/colorWhite"
+        android:textColor="@color/colorPrimary"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider3" />

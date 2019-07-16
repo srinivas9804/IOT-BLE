@@ -1,6 +1,14 @@
+/**
+ * @author Srinivas Sivakumar <srinivas9804@gmail.com,www.github.com/srinivas9804>
+ *
+ *     This Activity scans for nearby BLE devices and displays them in a Recycler View.
+ *     It also connects to a particular Bluetooth device after clicking on that item
+ *
+ */
 package com.example.airquality;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,7 +44,7 @@ import java.util.UUID;
 
 public class ScanActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter;
-    private BluetoothDevice mDevice;
+    private static BluetoothDevice mDevice;
     private BluetoothGatt mBluetoothGatt;
     private BluetoothGattCharacteristic writeCharacteristic, readCharacteristic;
     private BluetoothGattDescriptor readDescriptor;
@@ -57,6 +65,8 @@ public class ScanActivity extends AppCompatActivity {
 
     private ImageView uclBanner, airQualityLogo;
     private Button mRefresh;
+
+    private static AirDataViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,15 +112,19 @@ public class ScanActivity extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        mAdapter = new MyAdapter(devices);
+        mAdapter = new ScanDevicesAdapter(devices,this);
         recyclerView.setAdapter(mAdapter);
 
         mRefresh.setOnClickListener((View view) -> {
             devices.clear();
             scanLeDevice(true);
         });
-    }
 
+        ScanActivity.mViewModel = ViewModelProviders.of(this).get(AirDataViewModel.class);
+    }
+    public static void setDevice(BluetoothDevice mDevice){
+        ScanActivity.mDevice = mDevice;
+    }
     private void scanLeDevice(final boolean enable) {
         if (enable) {
             mHandler.postDelayed(()->{
@@ -156,7 +170,10 @@ public class ScanActivity extends AppCompatActivity {
         }
     };
 
-
+    static void connectDevice(int position, Context context){
+        ScanActivity obj = (ScanActivity)context;
+        obj.mBluetoothGatt = obj.devices.get(position).connectGatt(context,false,obj.mGattCallback);
+    }
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         public final String ACTION_GATT_CONNECTED =
                 "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
@@ -245,6 +262,7 @@ public class ScanActivity extends AppCompatActivity {
 //                    }
 //                });
                 Intent intent = new Intent(ScanActivity.this, DisplayActivity.class);
+                intent.putExtra("MAC_Address", ScanActivity.mDevice.getAddress());
                 startActivity(intent);
 
             } else {
@@ -269,8 +287,15 @@ public class ScanActivity extends AppCompatActivity {
             Log.i(TAG, "Received text = " +  new String(characteristic.getValue()));
             //MainActivity.mReceiveText.setText(new String(characteristic.getValue()));
             if(characteristic.equals(readCharacteristic)) {
-                DisplayActivity.update(new String(characteristic.getValue()));
+                String arr[] = new String(characteristic.getValue()).split(",");
+                if(arr.length == 9){
+                    AirData item = new AirData(ScanActivity.mDevice.getAddress(),System.currentTimeMillis(),Double.parseDouble(arr[0]),Double.parseDouble(arr[1]),
+                            Double.parseDouble(arr[2]),Double.parseDouble(arr[3]),Double.parseDouble(arr[4]),Double.parseDouble(arr[5]),Double.parseDouble(arr[6]),
+                            Double.parseDouble(arr[7]),Double.parseDouble(arr[8]));
+                    ScanActivity.mViewModel.insert(item);
+                }
             }
+
         }
     };
 }

@@ -10,6 +10,11 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
     buildTypes {
         release {
@@ -32,5 +37,17 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
 
+    def room_version = "2.1.0"
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+
+    def archLifecycleVersion = "2.0.0"
+    // Lifecycle components
+    implementation "androidx.lifecycle:lifecycle-extensions:$archLifecycleVersion"
+    annotationProcessor "androidx.lifecycle:lifecycle-compiler:$archLifecycleVersion"
+
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.android.volley:volley:1.1.1'
 }

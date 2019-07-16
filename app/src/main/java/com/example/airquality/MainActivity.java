@@ -1,9 +1,23 @@
+/**
+ * @author Srinivas Sivakumar <srinivas9804@gmail.com,www.github.com/srinivas9804>
+ *
+ *     Application to connect to a Bluetooth Low Energy(BLE) module.
+ *     Connects to a microchip RN4870 chip and uses the transparent UART mode to
+ *     read data asynchronously. The data is then stored in a Room database locally and uploaded
+ *     to a mongodb database through a node server
+ *
+ *     Note: The UUIDs are hard coded based on the datasheet, so make sure that they are
+ *     appropriate for other chips.
+ *
+ */
+
 package com.example.airquality;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.Manifest;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -14,30 +28,21 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.Manifest;
 import java.util.UUID;
-
-
-/**
- * @author Srinivas Sivakumar <srinivas9804@gmail.com,www.github.com/srinivas9804>
- *
- *     Application to connect to a Bluetooth Low Energy(BLE) module.
- *     Connects to a microchip RN4870 chip and uses the transparent UART mode to
- *     read data asynchronously.
- *
- *     Note: The UUIDs are hard coded based on the datasheet, so make sure that they are
- *     appropriate for other chips.
- *
- */
 
 public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter;
@@ -46,10 +51,12 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothGattCharacteristic writeCharacteristic, readCharacteristic;
     private BluetoothGattDescriptor readDescriptor;
 
+
     final UUID READ_WRITE_SERVICE_UUID = UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455");
     final UUID WRITE_CHARACTERISTIC_UUID = UUID.fromString("49535343-1E4D-4BD9-BA61-23C647249616");
     final UUID READ_CHARACTERISTIC_UUID = UUID.fromString("49535343-1E4D-4BD9-BA61-23C647249616");
     final UUID READ_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     Button mConnect;
 
     ImageView uclBanner, airQualityLogo;
@@ -59,17 +66,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        uclBanner = (ImageView) findViewById(R.id.uclBanner);
+        airQualityLogo = (ImageView) findViewById(R.id.airTrackerLogo);
+
+        //The following block is to set the height and width of the banners programmatically
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
-        uclBanner = (ImageView) findViewById(R.id.uclBanner);
-        airQualityLogo = (ImageView) findViewById(R.id.airTrackerLogo);
-
         uclBanner.getLayoutParams().width = (int)(0.6*width) ;
         airQualityLogo.getLayoutParams().width = (int)(0.3*width);
-        Log.i("imageSize", "width: " + width + " " + uclBanner.getLayoutParams().width + " " +airQualityLogo.getLayoutParams().width);
-        Log.i("imageSize", "height: " + uclBanner.getLayoutParams().height + " " +airQualityLogo.getLayoutParams().height);
+        //Log.i("imageSize", "width: " + width + " " + uclBanner.getLayoutParams().width + " " +airQualityLogo.getLayoutParams().width);
+        //Log.i("imageSize", "height: " + uclBanner.getLayoutParams().height + " " +airQualityLogo.getLayoutParams().height);
 
         if (Build.VERSION.SDK_INT >= 23) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
@@ -87,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             // Permission is not granted
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.READ_CONTACTS},
-                    0);
+                    MY_PERMISSIONS_REQUEST_LOCATION);
         }
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, "BLE not available", Toast.LENGTH_SHORT).show();
@@ -108,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         }
         mDevice = mBluetoothAdapter.getRemoteDevice("34:81:F4:54:8C:5C");
         if(mDevice == null){
-            Log.w("BLEDevice","Not found");
+            int w = Log.w("BLEDevice", "Not found");
             finish();
         }
         else{
@@ -116,121 +124,117 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkLocationPermission();
+    }
 
-    private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
-        public final String ACTION_GATT_CONNECTED =
-                "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
-        public final String ACTION_GATT_DISCONNECTED =
-                "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED";
-        public final String ACTION_GATT_SERVICES_DISCOVERED =
-                "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
-        public final String ACTION_DATA_AVAILABLE =
-                "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
-        public final String EXTRA_DATA =
-                "com.example.bluetooth.le.EXTRA_DATA";
-        private int mConnectionState = STATE_DISCONNECTED;
+    public void checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
 
-        private static final int STATE_DISCONNECTED = 0;
-        private static final int STATE_CONNECTING = 1;
-        private static final int STATE_CONNECTED = 2;
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-        String TAG = "BGatt";
-        @Override
-        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            String intentAction;
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                mConnectionState = STATE_CONNECTED;
-                Log.i(TAG, "Connected to GATT server.");
-                // Attempts to discover services after successful connection.
-                Log.i(TAG, "Attempting to start service discovery:" +
-                        mBluetoothGatt.discoverServices());
+                // Show an explanation to the user *asynchronously*
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                new AlertDialog.Builder(this)
+                        .setTitle("Location required")
+                        .setMessage("Location service needs to be enabled for Bluetooth LE discovery")
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //Prompt the user once explanation has been shown
+                                ActivityCompat.requestPermissions(MainActivity.this,
+                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                        MY_PERMISSIONS_REQUEST_LOCATION);
+                            }
+                        })
+                        .create()
+                        .show();
 
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                mConnectionState = STATE_DISCONNECTED;
-                Log.i(TAG, "Disconnected from GATT server.");
-                DisplayActivity.endActivity();
-            }
-        }
-
-        @Override
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i(TAG, "GATT SUCCESS");
-
-                /**
-                 * The following block is to log the services, characteristics and descriptors of the BLE server
-                 * Use this to find the appropriate UUIDs and update the final vars
-                 */
-                /*
-                List<BluetoothGattService> services = mBluetoothGatt.getServices();
-                for(BluetoothGattService service : services){
-                    Log.i(TAG, "service " + service.getUuid().toString());
-                    List<BluetoothGattCharacteristic> characteristics = service.getCharacteristics();
-                    for(BluetoothGattCharacteristic characteristic : characteristics){
-                        List<BluetoothGattDescriptor> descriptors = characteristic.getDescriptors();
-                        for(BluetoothGattDescriptor descriptor: descriptors){
-                            Log.i(TAG, "    "+service.getUuid()+","+ characteristic.getUuid()+","+descriptor.getUuid());
-                        }
-                    }
-                }
-                */
-
-                BluetoothGattService Service = mBluetoothGatt.getService(READ_WRITE_SERVICE_UUID);
-                if (Service == null) {
-                    Log.e("BGatt", "service not found!");
-                }
-                else {
-                    writeCharacteristic = Service.getCharacteristic(WRITE_CHARACTERISTIC_UUID);
-                    if (writeCharacteristic == null) {
-                        Log.e("BGatt", "char not found!");
-                    }
-                }
-                readCharacteristic = Service.getCharacteristic(READ_CHARACTERISTIC_UUID);
-                if (readCharacteristic == null) {
-                    Log.e("BGatt", "char not found!");
-                }
-                mBluetoothGatt.setCharacteristicNotification(readCharacteristic, true);
-                readDescriptor = readCharacteristic.getDescriptor(READ_DESCRIPTOR_UUID);
-                readDescriptor.setValue(
-                        BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-
-                boolean flag = mBluetoothGatt.writeDescriptor(readDescriptor);
-                Log.i("BGatt", "status " + flag);
-
-//                new Handler(Looper.getMainLooper()).post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Toast.makeText(MainActivity.this,
-//                                "Transparent UART link successful", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-                Intent intent = new Intent(MainActivity.this, DisplayActivity.class);
-                startActivity(intent);
 
             } else {
-                Log.i(TAG, "onServicesDiscovered received: " + status);
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
             }
         }
+        LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
-        @Override
-        public void onCharacteristicRead(BluetoothGatt gatt,
-                                         BluetoothGattCharacteristic characteristic,
-                                         int status) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i(TAG, "GATT SUCCESS");
-            }
-            else{
-                Log.i(TAG, "NOT GATT SUCCESS");
-            }
-        }
+        boolean gps_enabled = true;
+        boolean network_enabled = false;
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch(Exception ex) {}
 
-        @Override
-        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-            Log.i(TAG, "Received text = " +  new String(characteristic.getValue()));
-            //MainActivity.mReceiveText.setText(new String(characteristic.getValue()));
-            if(characteristic.equals(readCharacteristic)) {
-                DisplayActivity.update(new String(characteristic.getValue()));
-            }
+        try {
+            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch(Exception ex) {}
+
+        if (!gps_enabled && !network_enabled) {
+            // notify user
+            new AlertDialog.Builder(this)
+                    .setTitle("Location required")
+                    .setMessage("GPS is not enabled. Location service needs to be enabled for Bluetooth LE discovery")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Toast.makeText(MainActivity.this,
+                                "Sorry, GPS required", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    })
+                    .show();
         }
-    };
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // location-related task you need to do.
+                    Toast.makeText(MainActivity.this,
+                            "Location enabled", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    // permission denied, boo!
+                    new AlertDialog.Builder(this)
+                            .setTitle("Location required")
+                            .setMessage("Location service needs to be enabled for Bluetooth LE discovery")
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //Prompt the user once explanation has been shown
+                                    ActivityCompat.requestPermissions(MainActivity.this,
+                                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                            MY_PERMISSIONS_REQUEST_LOCATION);
+                                }
+                            })
+                            .create()
+                            .show();
+                }
+                return;
+            }
+
+        }
+    }
 }
