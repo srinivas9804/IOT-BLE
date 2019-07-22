@@ -20,7 +20,7 @@ public interface AirDataDao {
     LiveData<List<AirData>> getAll();
 
     @Query("SELECT * FROM AIR_DATA WHERE MAC_Address IN (:macIDs)")
-    LiveData<List<AirData>> loadAllByIds(String[] macIDs);
+    LiveData<List<AirData>> loadAllByMac(String[] macIDs);
 
     @Query("SELECT * FROM AIR_DATA WHERE MAC_Address= (:macAddress) AND Timestamp= (:timestamp)")
     AirData get(String macAddress, long timestamp);

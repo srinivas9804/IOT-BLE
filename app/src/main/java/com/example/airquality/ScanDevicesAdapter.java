@@ -24,7 +24,6 @@ public class ScanDevicesAdapter extends RecyclerView.Adapter<ScanDevicesAdapter.
 
     static List<BluetoothDevice> devices;
     static Context context;
-    //String array[][];//just for testing
 
 
     // Provide a reference to the views for each data item
@@ -32,17 +31,16 @@ public class ScanDevicesAdapter extends RecyclerView.Adapter<ScanDevicesAdapter.
     // you provide access to all the views for a data item in a view holder
     public static class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         // each data item is just a string in this case
-        public TextView mDeviceName;
-        public TextView mMacAddress;
+        private TextView mDeviceName;
+        private TextView mMacAddress;
         CardView cv;
 
-        public MyViewHolder(View view) {
+        private MyViewHolder(View view) {
             super(view);
             view.setOnClickListener(this);
-            cv = (CardView) view.findViewById(R.id.card_view);
-            mDeviceName = (TextView) view.findViewById(R.id.deviceName);
-            mMacAddress = (TextView) view.findViewById(R.id.macAddress);
-
+            cv = view.findViewById(R.id.card_view);
+            mDeviceName = view.findViewById(R.id.deviceName);
+            mMacAddress = view.findViewById(R.id.macAddress);
         }
 
         @Override
@@ -58,13 +56,9 @@ public class ScanDevicesAdapter extends RecyclerView.Adapter<ScanDevicesAdapter.
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public ScanDevicesAdapter(List<BluetoothDevice> devices, Context context) {
-        this.devices = devices;
+        ScanDevicesAdapter.devices = devices;
         ScanDevicesAdapter.context = context;
     }
-
-//    public ScanDevicesAdapter(String data[][]) { // test
-//        this.array = data;
-//    }
 
     // Create new views (invoked by the layout manager)
     @Override
@@ -87,16 +81,11 @@ public class ScanDevicesAdapter extends RecyclerView.Adapter<ScanDevicesAdapter.
             holder.mDeviceName.setText("Null");
         }
         holder.mMacAddress.setText(devices.get(position).getAddress());
-//        holder.mMacAddress.setText(array[position][0]);
-//        holder.mDeviceName.setText(array[position][1]);
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-//        return array.length;//test
         return devices.size();
     }
-
-
 }

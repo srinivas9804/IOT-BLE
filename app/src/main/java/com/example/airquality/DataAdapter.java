@@ -7,12 +7,18 @@
 package com.example.airquality;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -58,9 +64,20 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.MyViewHolder> 
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.mDataCell.setText(list.get(position));
-        if(position <= 9){
+        if((position % 2) == 1)
+        {
+            ColorStateList temp = holder.itemView.getBackgroundTintList();
+
+            holder.mDataCell.setTypeface(null, Typeface.NORMAL);
+            holder.mDataCell.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+            holder.mDataCell.setBackgroundColor(ContextCompat.getColor(context,R.color.colorWhite));
+            holder.mDataCell.setTextColor(ContextCompat.getColor(context,R.color.colorPrimary));
+        }
+        else{
             holder.mDataCell.setTypeface(null, Typeface.BOLD);
             holder.mDataCell.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+            holder.mDataCell.setBackgroundColor(ContextCompat.getColor(context,R.color.colorPrimary));
+            holder.mDataCell.setTextColor(ContextCompat.getColor(context,R.color.colorWhite));
         }
     }
     @Override

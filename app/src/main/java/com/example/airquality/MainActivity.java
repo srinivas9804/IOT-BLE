@@ -46,16 +46,7 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter;
-    private BluetoothDevice mDevice;
-    private BluetoothGatt mBluetoothGatt;
-    private BluetoothGattCharacteristic writeCharacteristic, readCharacteristic;
-    private BluetoothGattDescriptor readDescriptor;
 
-
-    final UUID READ_WRITE_SERVICE_UUID = UUID.fromString("49535343-fe7d-4ae5-8fa9-9fafd205e455");
-    final UUID WRITE_CHARACTERISTIC_UUID = UUID.fromString("49535343-1E4D-4BD9-BA61-23C647249616");
-    final UUID READ_CHARACTERISTIC_UUID = UUID.fromString("49535343-1E4D-4BD9-BA61-23C647249616");
-    final UUID READ_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     Button mConnect;
 
@@ -66,13 +57,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        uclBanner = (ImageView) findViewById(R.id.uclBanner);
-        airQualityLogo = (ImageView) findViewById(R.id.airTrackerLogo);
+        uclBanner = findViewById(R.id.uclBanner);
+        airQualityLogo = findViewById(R.id.airTrackerLogo);
+        mConnect = findViewById(R.id.connectButton);
 
         //The following block is to set the height and width of the banners programmatically
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
         uclBanner.getLayoutParams().width = (int)(0.6*width) ;
         airQualityLogo.getLayoutParams().width = (int)(0.3*width);
@@ -82,13 +73,6 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= 23) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
         }
-
-        mConnect = (Button) findViewById(R.id.connectButton);
-        mConnect.setOnClickListener((View view)->{
-            //mBluetoothGatt = mDevice.connectGatt(MainActivity.this, false, mGattCallback);
-            Intent intent = new Intent(MainActivity.this,ScanActivity.class);
-            startActivity(intent);
-        });
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -114,14 +98,11 @@ public class MainActivity extends AppCompatActivity {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent,0);
         }
-        mDevice = mBluetoothAdapter.getRemoteDevice("34:81:F4:54:8C:5C");
-        if(mDevice == null){
-            int w = Log.w("BLEDevice", "Not found");
-            finish();
-        }
-        else{
-            Log.w("BLEDevice","found");
-        }
+        mConnect.setOnClickListener((View view)->{
+            Intent intent = new Intent(MainActivity.this,ScanActivity.class);
+            startActivity(intent);
+        });
+
     }
 
     @Override
@@ -135,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
-            // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
 

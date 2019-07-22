@@ -1,0 +1,95 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "c8a84d71cc124a5d2085fd77949652ae",
+    "entities": [
+      {
+        "tableName": "AIR_DATA",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`MAC_Address` TEXT NOT NULL, `Timestamp` INTEGER NOT NULL, `Humidity` REAL NOT NULL, `Temperature` REAL NOT NULL, `Air_Pressure` REAL NOT NULL, `Altitude` REAL NOT NULL, `VOCs` REAL NOT NULL, `eC02` REAL NOT NULL, `Pm1` REAL NOT NULL, `Pm25` REAL NOT NULL, `Pm10` REAL NOT NULL, PRIMARY KEY(`MAC_Address`, `Timestamp`))",
+        "fields": [
+          {
+            "fieldPath": "macAddress",
+            "columnName": "MAC_Address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "Timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "humidity",
+            "columnName": "Humidity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "temperature",
+            "columnName": "Temperature",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "airPressure",
+            "columnName": "Air_Pressure",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "altitude",
+            "columnName": "Altitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vocs",
+            "columnName": "VOCs",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eco2",
+            "columnName": "eC02",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pm1",
+            "columnName": "Pm1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pm25",
+            "columnName": "Pm25",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pm10",
+            "columnName": "Pm10",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "MAC_Address",
+            "Timestamp"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c8a84d71cc124a5d2085fd77949652ae')"
+    ]
+  }
+}

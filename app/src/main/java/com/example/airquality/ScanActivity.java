@@ -72,18 +72,22 @@ public class ScanActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
-        uclBanner = (ImageView) findViewById(R.id.uclBanner);
-        airQualityLogo = (ImageView) findViewById(R.id.airTrackerLogo);
+        uclBanner = findViewById(R.id.uclBanner);
+        airQualityLogo = findViewById(R.id.airTrackerLogo);
+        mRefresh = findViewById(R.id.refreshButton);
+        recyclerView = findViewById(R.id.my_recycler_view);
+
         mHandler = new Handler();
         devices = new ArrayList<>();
-        mRefresh = (Button) findViewById(R.id.refreshButton);
         final BluetoothManager bluetoothManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
+        mLEScanner = mBluetoothAdapter.getBluetoothLeScanner();
+        ScanActivity.mViewModel = ViewModelProviders.of(this).get(AirDataViewModel.class);
 
-        // Dynamically setting height and width of images
+        // Dynamically setting width of images
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
         uclBanner.getLayoutParams().width = (int)(0.6*width) ;
         airQualityLogo.getLayoutParams().width = (int)(0.3*width);
@@ -93,17 +97,12 @@ public class ScanActivity extends AppCompatActivity {
         }
 
 
-        mBluetoothAdapter = bluetoothManager.getAdapter();
-
-        mLEScanner = mBluetoothAdapter.getBluetoothLeScanner();
         settings = new ScanSettings.Builder()
                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                 .build();
-        filters = new ArrayList<ScanFilter>();
+        filters = new ArrayList<>();
         scanLeDevice(true);
 
-
-        recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         recyclerView.setHasFixedSize(true);
@@ -120,7 +119,6 @@ public class ScanActivity extends AppCompatActivity {
             scanLeDevice(true);
         });
 
-        ScanActivity.mViewModel = ViewModelProviders.of(this).get(AirDataViewModel.class);
     }
     public static void setDevice(BluetoothDevice mDevice){
         ScanActivity.mDevice = mDevice;
@@ -139,10 +137,10 @@ public class ScanActivity extends AppCompatActivity {
     private ScanCallback mScanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
-            Log.i("shaataAct callbackType", String.valueOf(callbackType));
-            Log.i("shaataAct result", result.toString());
+            Log.i("BGatt callbackType", String.valueOf(callbackType));
+            Log.i("BGatt result", result.toString());
             BluetoothDevice btDevice = result.getDevice();
-            Log.i("shaataAct device", btDevice.getName() + " " + btDevice.getAddress());
+            Log.i("BGatt device", btDevice.getName() + " " + btDevice.getAddress());
             boolean flag = true;
             for(BluetoothDevice bt : devices){
                 if(bt.getAddress().equals(btDevice.getAddress())){
@@ -153,20 +151,20 @@ public class ScanActivity extends AppCompatActivity {
             if(flag){
                 devices.add(btDevice);
                 mAdapter.notifyDataSetChanged();
-                Log.i("shaataAct devices", devices.toString());
+                Log.i("BGatt devices", devices.toString());
             }
         }
 
         @Override
         public void onBatchScanResults(List<ScanResult> results) {
             for (ScanResult sr : results) {
-                Log.i("shaataAct - Results", sr.toString());
+                Log.i("BGatt - Results", sr.toString());
             }
         }
 
         @Override
         public void onScanFailed(int errorCode) {
-            Log.e("shaataAct Scan Failed", "Error Code: " + errorCode);
+            Log.e("BGatt Scan Failed", "Error Code: " + errorCode);
         }
     };
 
@@ -175,16 +173,6 @@ public class ScanActivity extends AppCompatActivity {
         obj.mBluetoothGatt = obj.devices.get(position).connectGatt(context,false,obj.mGattCallback);
     }
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
-        public final String ACTION_GATT_CONNECTED =
-                "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
-        public final String ACTION_GATT_DISCONNECTED =
-                "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED";
-        public final String ACTION_GATT_SERVICES_DISCOVERED =
-                "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
-        public final String ACTION_DATA_AVAILABLE =
-                "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
-        public final String EXTRA_DATA =
-                "com.example.bluetooth.le.EXTRA_DATA";
         private int mConnectionState = STATE_DISCONNECTED;
 
         private static final int STATE_DISCONNECTED = 0;
@@ -194,7 +182,6 @@ public class ScanActivity extends AppCompatActivity {
         String TAG = "BGatt";
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            String intentAction;
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 mConnectionState = STATE_CONNECTED;
                 Log.i(TAG, "Connected to GATT server.");
@@ -212,13 +199,13 @@ public class ScanActivity extends AppCompatActivity {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i(TAG, "GATT SUCCESS");
+                Log.i(TAG, "BGatt SUCCESS");
 
-                /**
-                 * The following block is to log the services, characteristics and descriptors of the BLE server
-                 * Use this to find the appropriate UUIDs and update the final vars
-                 */
+
                 /*
+                The following block is to log the services, characteristics and descriptors of the BLE server
+                Use this to find the appropriate UUIDs and update the final vars if necessary
+
                 List<BluetoothGattService> services = mBluetoothGatt.getServices();
                 for(BluetoothGattService service : services){
                     Log.i(TAG, "service " + service.getUuid().toString());
@@ -234,17 +221,17 @@ public class ScanActivity extends AppCompatActivity {
 
                 BluetoothGattService Service = mBluetoothGatt.getService(READ_WRITE_SERVICE_UUID);
                 if (Service == null) {
-                    Log.e("BGatt", "service not found!");
+                    Log.e(TAG, "service not found!");
                 }
                 else {
                     writeCharacteristic = Service.getCharacteristic(WRITE_CHARACTERISTIC_UUID);
                     if (writeCharacteristic == null) {
-                        Log.e("BGatt", "char not found!");
+                        Log.e(TAG, "char not found!");
                     }
                 }
                 readCharacteristic = Service.getCharacteristic(READ_CHARACTERISTIC_UUID);
                 if (readCharacteristic == null) {
-                    Log.e("BGatt", "char not found!");
+                    Log.e(TAG, "char not found!");
                 }
                 mBluetoothGatt.setCharacteristicNotification(readCharacteristic, true);
                 readDescriptor = readCharacteristic.getDescriptor(READ_DESCRIPTOR_UUID);
@@ -252,15 +239,7 @@ public class ScanActivity extends AppCompatActivity {
                         BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
 
                 boolean flag = mBluetoothGatt.writeDescriptor(readDescriptor);
-                Log.i("BGatt", "status " + flag);
-
-//                new Handler(Looper.getMainLooper()).post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Toast.makeText(MainActivity.this,
-//                                "Transparent UART link successful", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
+                Log.i(TAG, "status " + flag);
                 Intent intent = new Intent(ScanActivity.this, DisplayActivity.class);
                 intent.putExtra("MAC_Address", ScanActivity.mDevice.getAddress());
                 startActivity(intent);
